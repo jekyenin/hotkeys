@@ -1,5 +1,6 @@
 # Hotkeys.js
 ![Hotkeys.js](http://evgenin.ru/github/images/hotkeys.png)
+
 Плагин `hotkeys.js` позволяет добавлять на страницу обработчики для сочетаний клавиш.
 
 ## Быстрый старт
