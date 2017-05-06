@@ -1,8 +1,17 @@
-var Hotkeys = function( startHotkeys ){
-
+var Hotkeys = function( options ){
+	
 	var _this = this,
 		pressed = [],
 		hotkeys = {},
+		callbacks = {
+			onAdd: function(hotkey){},
+			onDone: function(hotkey){},
+			onChange: function(hotkey){},
+			onRemove: function(hotkey){},
+			onTrigger: function(hotkey){},
+			onCreate: function(){},
+			onDestroy: function(){},
+		},
 		aliases = {
 			16 : 'shift',
 			17 : 'ctrl',
@@ -14,11 +23,13 @@ var Hotkeys = function( startHotkeys ){
 		},
 		destroyed = false;
 
+	options = options || {};
+
 	// При нажатии клавиши
 	// Добавить в список нажатые клавиши
 	function keydown( event ){
 		var keyCode = getKeyCode( event ),
-			match;
+			hotkey;
 
 		if( !checkKey( keyCode ) ){
 			pressed.push( keyCode );
@@ -29,14 +40,17 @@ var Hotkeys = function( startHotkeys ){
 		if(!hotkey){
 			return;
 		}
-		
-		event.preventDefault();
+		if( hotkey.prevent ){
+			event.preventDefault();
+		}
 		if( event.repeat ){
 			return;
 		}
 
 		if( hotkey.func ){
 			hotkey.func();
+			callbacks.onDone(hotkey);
+
 		}
 
 	}
@@ -44,7 +58,8 @@ var Hotkeys = function( startHotkeys ){
 	// При отпускании клавиш
 	// Удалить из списка отпущенные клавиши
 	function keyup( event ){
-		var keyCode = getKeyCode( event );
+		var keyCode = getKeyCode( event ),
+			pos;
 		
 		if( checkKey( keyCode ) ){
 			pos = pressed.indexOf( keyCode );
@@ -54,8 +69,14 @@ var Hotkeys = function( startHotkeys ){
 	}
 
 	// Добавить событие на хоткей
-	// hotkey.add('Ctrl+S', save);
-	this.add = function( combination, func ){
+	// hotkey.add(string, function[, boolean]);
+	this.add = function( combination, func, prevent ){
+		var comb;
+
+		if( prevent === undefined ){
+			prevent = true;
+		}
+
 		if(arguments.length < 2){
 			throw TypeError( 'Failed to execute \'add\' on \'Hotkeys\': 2 arguments required, but ' + arguments.length + ' present.' );			
 		}
@@ -66,9 +87,9 @@ var Hotkeys = function( startHotkeys ){
 			throw TypeError( 'The second argument must be a function' );
 		}
 
-		combination = combination.toLowerCase();
+		comb = combination.toLowerCase();
 
-		var symbols = combination.split( '+' ),
+		var symbols = comb.split( '+' ),
 			codes = [],
 			symbol;
 			
@@ -79,10 +100,12 @@ var Hotkeys = function( startHotkeys ){
 		}
 
 		var hotkeyObject = {
+			combination: combination,
 			symbols: symbols,
 			codes: codes,
 			length: codes.length,
 			func: func,
+			prevent: prevent
 		};
 
 		if( destroyed ){
@@ -90,15 +113,24 @@ var Hotkeys = function( startHotkeys ){
 			addListeners();
 		}
 
-		hotkeys[ combination ] = hotkeyObject;
+		if( hotkeys[ comb ] ){
+			hotkeys[ comb ] = hotkeyObject;
+			callbacks.onChange(hotkeyObject);
+		} else {
+			hotkeys[ comb ] = hotkeyObject;
+			callbacks.onAdd(hotkeyObject);
+		}
+
 
 		return _this;
 
-	}
+	};
 
 	// Удалить слушателя события для комбинации
-	// hotkey.remove('Ctrl+S');
+	// hotkey.remove(string);
 	this.remove = function( combination ){
+		var comb, hotkey;
+
 		if(arguments.length < 1){
 			throw TypeError( 'Failed to execute \'remove\' on \'Hotkeys\': 1 argument required, but ' + arguments.length + ' present.' );			
 		}
@@ -108,34 +140,45 @@ var Hotkeys = function( startHotkeys ){
 		if( hotkeys[ comb ] === undefined ){
 			throw TypeError( 'Hotkey ' + combination + ' is undefined' );
 		}
+		hotkey = hotkeys [ comb ];
 		delete hotkeys[ comb ];
 
+		callbacks.onRemove( hotkey );
+
 		return _this;
-	}
+	};
 
 	// Генерировать нажатие комбинации
 	// hotkey.trigger('Ctrl+S');
 	this.trigger = function( combination ){
+		var hotkey, comb;
+
 		if(arguments.length < 1){
 			throw TypeError( 'Failed to execute \'trigger\' on \'Hotkeys\': 1 argument required, but ' + arguments.length + ' present.' );			
 		}
+
 		comb = combination.toLowerCase();
 		hotkey = hotkeys[ comb ];
+
 		if( hotkey === undefined ){
 			throw TypeError( 'Hotkey ' + combination + ' is undefined' );	
 		}
+
 		hotkey.func();
+		callbacks.onTrigger( hotkey );
 
 		return _this;
-	}
+	};
 
 	// Разрушение библиотеки
 	this.destroy = function(){
+		
 		destroyed = true;
 		removeListeners();
+		callbacks.onDestroy();
 
 		return _this;
-	}
+	};
 
 	// Проверка наличия нажатой клавиши в нашем массиве нажатых клавиш
 	function checkKey( keyCode ){
@@ -163,7 +206,7 @@ var Hotkeys = function( startHotkeys ){
 
 	// Преобразование символа в код клавиши
 	function toCode( symbol ){
-		for( code in aliases ){
+		for( var code in aliases ){
 			if( aliases[ code ] == symbol ){
 				return +code;
 			}
@@ -174,31 +217,34 @@ var Hotkeys = function( startHotkeys ){
 	// lowercase из кода клавиши
 	function codeLowerCase( keyCode ){
 		return toCode( toSymbol( keyCode ).toLowerCase() );
-	};
+	}
 
 	// Очистка массива нажатых клавиш
 	function clearPressed(){
 		pressed = [];
-	};
+	}
 
 	// Проверка на совпадения клавиш с хоткеями
 	function checkCombination( hotkeys, codes ){
 		var hotkeyCodes,
-			bestElem = { length: 0 };
+			bestElem = { length: 0 },
+			hotkey;
 
-		for( key in hotkeys ){
-			hotkey = hotkeys[ key ];
-			hotkeyCodes = hotkey.codes;
+		for( var key in hotkeys ){
+			if (hotkeys.hasOwnProperty(key)) {
+				hotkey = hotkeys[ key ];
+				hotkeyCodes = hotkey.codes;
 
-			if( exist( codes, hotkeyCodes ) && hotkey.length > bestElem.length ){
-				bestElem = hotkey;
+				if( exist( codes, hotkeyCodes ) && hotkey.length > bestElem.length ){
+					bestElem = hotkey;
+				}
 			}
 		}
 		if( bestElem.length > 0 ){
 			return bestElem;
 		}
 		return false;
-	};
+	}
 
 	// Проверка массива на вхождение в другой
 	function exist( base, primary ){
@@ -206,44 +252,54 @@ var Hotkeys = function( startHotkeys ){
 			key,
 			result = true;
 
-		for(var index = 0, length = base.length; index < length; index++){
-			key = base[ index ];
+		for(var baseIndex = 0, baseLength = base.length; baseIndex < baseLength; baseIndex++){
+			key = base[ baseIndex ];
 			hash[ key ] = true;
 		}
-		for(var index = 0, length = primary.length; index < length; index++){
-			key = primary[ index ];
+		for(var primaryIndex = 0, primaryLength = primary.length; primaryIndex < primaryLength; primaryIndex++){
+			key = primary[ primaryIndex ];
 			if( !( key in hash ) ){
 				result = false;
 			}
 		}
 		return result;
-	};
+	}
 
 	// Назначение обработчиков событий браузера
 	function addListeners(){
 		document.addEventListener( 'keydown', keydown, false );
 		document.addEventListener( 'keyup', keyup, false );
 		window.addEventListener('blur',clearPressed,false);
-	};
+	}
 
 	// Удаление обработчиков событий браузера
 	function removeListeners(){
 		document.removeEventListener( 'keydown', keydown);
 		document.removeEventListener( 'keyup', keyup);
 		window.removeEventListener( 'blur', clearPressed);
-	};
+	}
 
 	// Создание основы
-	function create( startHotkeys ){
+	function create( options ){
 		var func;
 
-		for (key in startHotkeys){
-			func = startHotkeys[ key ];
-			_this.add( key, func );
+		for (var callbackKey in callbacks){
+			if( options.hasOwnProperty(callbackKey) ){
+				callbacks[ callbackKey ] = options[ callbackKey ];
+				delete options[ callbackKey ];
+			}
+		}
+
+		for (var key in options){
+			if (options.hasOwnProperty(key)) {
+				func = options[ key ];
+				_this.add( key, func );
+			}
 		}
 
 		addListeners();
-	};
+		callbacks.onCreate();
+	}
 
-	create(startHotkeys);
-}
+	create(options);
+};

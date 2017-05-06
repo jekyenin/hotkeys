@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Hotkeys.js</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css" />
+	<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+	<div class="main">
+		<div class="content">
+			<h1 class="title">Hotkeys.js</h1>
+			<p class="description">Библиотека для создания хоткеев на странице. Включает в себя удобное API управления комбинациями.</p>
+			<div class="desc example">
+				<h2><span>Попробовать вживую</span></h2>
+				<p class="desc-text">Уже сейчас можно нажимать комбинации созданные ниже. Чтобы тригернуть комбинацию надо по ней кликнуть, а для удаления кликнуть на крестик. <span>Prevent</span> - это отмена стандартного действия, например для комбинации <span>Ctrl+E</span> выделится адресная строка, если создать комбинацию с <span>prevent</span>, то строка не выделится.</p>
+				<div class="add-outer">
+					<input type="text" class="add-field" id="addField" value="Ctrl+C">
+					<div class="prevent" title="Check if you want preventDefault">
+						<input type="checkbox" id="addPrevent" checked>
+						<label class='add-prevent' for="addPrevent">
+						<span>prevent</span></label>
+					</div>
+					<a href="#" class="add-button" id="addButton">Добавить</a>
+				</div>
+				<ul class="list-hotkeys" id='list'>
+				</ul>
+				<div class="log">
+					<textarea id="log" spellcheck="false"></textarea>
+				</div>
+			</div>
+			<div class="desc">
+				<h2><span>Первые шаги</span></h2>
+				<p class="desc-text">Чтобы начать работать с библиотекой много не нужно..</p>
+				<p class="info">Нужно назначить экземпляр объекта <span>Hotkey</span> переменной и добавить обработчики</p>
+				<p class="code">var hotkeys = new Hotkeys({
+	"Ctrl+S": function(){
+		// Различные штуковины, которые сработают при нажатии комбинации
+	},
+	"onDone": function(){
+		// Обработка события окончания действий функции-обработчика комбинации клавиш
+	},
+});</p>
+				<p class="info">Комбинации выглядят следующим образом, по разному в общем.</p>
+				<p class="code">"Ctrl+S"
+"Ctrl+Shift+E"
+"Ctrl+Z"
+"Ctrl+Alt+Shift+A"</p>
+				<p class="info"><span class="danger">Многие комбинации невозможно перехватить</span>, например: закрытие страницы, важные браузерные комбинации, системные комбинации и т.д. Политика безопасности браузеров запрещает отменять стандартные события важных комбинаций. Такие комбинации как обновление, сохранение и т.п. переназначать разрешено.</p>
+			</div>
+			<div class="desc">
+				<h2><span>API</span></h2>
+				<p class="desc-text">Методы для управления горячими клавишами на странице. Для взаимодействия с горячими клавишами необходимо обращаться через экземпляр.</p>
+				<p class="info">Для добавления комбинации клавиш на страницу необходимо в методе <span>add</span> указать комбинацию и метод</p>
+				<p class="code">hotkeys.add("Ctrl+S", function(){
+	//Различные штуковины, которые сработают при нажатии комбинации
+});
+/*
+hotkey.add( combination, function[, prevent] );
+combination (string - "Ctrl+S")
+function (function - function(){})
+prevent (boolean - true)
+*/</p>
+				<p class="info">Для вызова обработчика комбинации из кода нужно использовать метод <span>trigger</span></p>
+				<p class="code">hotkeys.trigger("Ctrl+S");
+/*
+hotkey.trigger( combination );
+combination (string - "Ctrl+S")
+*/</p>
+				<p class="info">Чтобы удалить обработчик из списка горячих клавиш необходимо использовать метод <span>remove</span></p>
+				<p class="code">hotkeys.remove("Ctrl+S");
+/*
+hotkey.remove( combination );
+combination (string - "Ctrl+S")
+*/
+				</p>
+				<p class="info">Чтобы отключить плагин и приостановить его работу нужно воспользоваться методом <span>destroy</span></p>
+				<p class="code">hotkeys.destroy();</p>
+			</div>
+			<div class="desc">
+				<h2><span>События</span></h2>
+				<p class="desc-text">События устанавливаются при создании экземпляра через методы</p>
+				<p class="info">Метод <span>onCreate</span> срабатывает при инициализации библиотеки</p>
+				<p class="code">var options = { onCreate : function(){} }</p>
+				<p class="info">Метод <span>onAdd</span> срабатывает при добавлении горячей клавиши</p>
+				<p class="code">var options = { onAdd : function(){} }</p>
+				<p class="info">Метод <span>onDone</span> срабатывает при срабатывании комбинации при нажатии клавиш</p>
+				<p class="code">var options = { onDone : function(){} }</p>
+				<p class="info">Метод <span>onChange</span> срабатывает при изменении метода горячей клавиши</p>
+				<p class="code">var options = { onChange : function(){} }</p>
+				<p class="info">Метод <span>onRemove</span> срабатывает при удалении горячей клавиши</p>
+				<p class="code">var options = { onRemove : function(){} }</p>
+				<p class="info">Метод <span>onTrigger</span> срабатывает при вызове метода горячей клавиши через код</p>
+				<p class="code">var options = { onTrigger : function(){} }</p>
+				<p class="info">Метод <span>onRemove</span> срабатывает при удалении горячей клавиши</p>
+				<p class="code">var options = { onRemove : function(){} }</p>
+			</div>
+			<p class="download"><a href="https://github.com/jekyenin/hotkeys">Изучить на GitHub</a></p>
+			<p class="download"><a href="https://github.com/jekyenin/hotkeys/archive/master.zip">Скачать ZIP-архив с плагином</a></p>
+		</div>
+		<footer>
+			<div class="content">
+				<p>2017 <a href="http://evgenin.ru">evgenin.ru</a></p>
+			</div>
+		</footer>
+	</div>
+	<!-- GitHub ribbon -->
+	<a class="github-fork-ribbon" href="https://github.com/jekyenin/hotkeys" title="Fork me on GitHub">Fork me on GitHub</a>
+	<script src='../hotkeys.min.js'></script>
+	<script src='syntax.js'></script>
+	<script src='common.js'></script>
+</body>
+</html>

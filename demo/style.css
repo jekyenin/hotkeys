@@ -1,0 +1,327 @@
+@font-face {
+  font-family: 'Rubik';
+  src: url('Rubik-Light.woff');
+  font-weight: 300;
+  font-style: 'normal';
+}
+@font-face {
+  font-family: 'Rubik';
+  src: url('Rubik-BlackItalic.woff');
+  font-weight: 900;
+  font-style: 'italic';
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  height: 100%;
+}
+body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: table;
+}
+body:before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  background: #fff;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+}
+body:after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  background-image: linear-gradient(#00bb66, #0093bb);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+html,
+input,
+textarea {
+  font-size: 16px;
+  font-family: 'Rubik';
+}
+.main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: table-row;
+}
+.main a {
+  text-decoration: none;
+  color: #00bb66;
+  transition: color 0.35s;
+  padding: 0px .3em;
+}
+.main a:hover {
+  color: #0093bb;
+}
+.content {
+  position: relative;
+  display: block;
+  padding: 0 2rem 0;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.main > .content {
+  padding-bottom: 3rem;
+}
+h1.title {
+  font-size: 5rem;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.3em;
+  margin: .5em 0;
+  background-image: linear-gradient(#ffffff, #00bb66, #0093bb);
+  color: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+h2 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: normal;
+  font-style: normal;
+  text-transform: uppercase;
+}
+h2 span {
+  background-image: linear-gradient(#ffffff, #00bb66, #0093bb);
+  color: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+  display: inline-block;
+  border-left: 1px solid #00bb66;
+  border-right: 1px solid #00bb66;
+  border-radius: 0.5rem;
+}
+.description {
+  font-size: 1.4rem;
+  text-align: center;
+  margin-bottom: 1em;
+}
+.example {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto 5rem;
+}
+.info {
+  margin-bottom: .4em;
+}
+.info span {
+  color: #0095B9;
+}
+.info span.danger {
+  color: #f03927;
+}
+.code {
+  background: #F4FAFF;
+  border: 1px dashed #5CC4D0;
+  margin-bottom: 1em;
+  padding: .4em 1em;
+  word-break: break-word;
+  /*highlight*/
+  /* Строки красные */
+  /* Юзер-функции синие */
+  /* Комменты оранжевые */
+  /* Ключевые слова полужирные */
+  /*Серые регвыражения */
+}
+.code .S {
+  color: #273980;
+}
+.code .func {
+  color: #f03927;
+}
+.code .C {
+  color: #808080;
+}
+.code .kwrd {
+  color: #0095b9;
+}
+.code .R {
+  color: #808080;
+}
+.desc {
+  margin-bottom: 5em;
+}
+.desc .desc-text {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 1em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1em;
+}
+.desc .desc-text span {
+  color: #0095B9;
+}
+.add-outer {
+  font-size: 1.4rem;
+  margin-bottom: .4em;
+}
+.add-outer .add-field {
+  display: inline-block;
+  vertical-align: bottom;
+  outline: none;
+  border: 1px solid #00bb66;
+  border-radius: .2em;
+  padding: .1em .3em;
+  font-size: 2rem;
+  background: #fff;
+  width: 60%;
+  margin-right: .3em;
+}
+.add-outer .add-button {
+  display: inline-block;
+  vertical-align: bottom;
+}
+.add-outer .prevent {
+  display: inline-block;
+}
+.add-outer .prevent input {
+  display: none;
+}
+.add-outer .prevent .add-prevent {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #00bb66;
+  background: #fff;
+  outline: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: .2em;
+  vertical-align: bottom;
+  cursor: pointer;
+}
+.add-outer .prevent .add-prevent span {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .5em;
+  bottom: 110%;
+}
+.add-outer .prevent .add-prevent:before,
+.add-outer .prevent .add-prevent:after {
+  opacity: .3;
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  background: #00bb66;
+}
+.add-outer .prevent .add-prevent:before {
+  transform: translate(-0.55rem, -0.2rem) rotate(-45deg);
+  height: .8rem;
+}
+.add-outer .prevent .add-prevent:after {
+  transform: translate(0.15rem, -0.7rem) rotate(45deg);
+  height: 1.2rem;
+}
+.add-outer .prevent #addPrevent:checked + .add-prevent:before,
+.add-outer .prevent #addPrevent:checked + .add-prevent:after {
+  opacity: 1;
+}
+.list-hotkeys {
+  width: 100%;
+  list-style: none;
+}
+.list-hotkeys .hotkey {
+  display: inline-block;
+  font-size: .8em;
+  border-radius: .2em;
+  padding: 2px 5px;
+  background: #e6f8f0;
+  border: 1px solid #00bb66;
+  margin-right: .5rem;
+  margin-bottom: .5rem;
+}
+.list-hotkeys .hotkey a {
+  padding: 0;
+}
+.list-hotkeys .hotkey span.remove {
+  position: relative;
+  display: inline-block;
+  width: .8em;
+  height: .8em;
+  top: 50%;
+  cursor: pointer;
+  color: #00bb66;
+  transition: color 0.35s;
+}
+.list-hotkeys .hotkey span.remove:after,
+.list-hotkeys .hotkey span.remove:before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+}
+.list-hotkeys .hotkey span.remove:before {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.list-hotkeys .hotkey span.remove:after {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.list-hotkeys .hotkey span.remove:hover {
+  color: #0093bb;
+}
+.log textarea {
+  outline: none;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-width: 100%;
+  height: 200px;
+  border-radius: .2em;
+  border: 1px solid #00bb66;
+  resize: none;
+  padding: .3em .6em;
+  font-size: .8em;
+}
+footer {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+  right: 3px;
+  padding: 1rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.1);
+  color: #00a5ff;
+}
+footer a {
+  text-transform: uppercase;
+}
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 12px;
+  }
+  h1.title {
+    font-size: 4rem;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 1240px) {
+  html {
+    font-size: 14px;
+  }
+}
+@media screen and (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
